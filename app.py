@@ -2,17 +2,21 @@ from flask import Flask, jsonify, request
 
 app = Flask(_name_)
 
-# Sample data
-users = [
+# Sample Orders
+orders = [
     {
         "id": 1,
-        "name": "John",
-        "email": "john@gmail.com"
+        "user_id": 1,
+        "product": "Laptop",
+        "quantity": 1,
+        "price": 70000
     },
     {
         "id": 2,
-        "name": "David",
-        "email": "david@gmail.com"
+        "user_id": 2,
+        "product": "Mobile",
+        "quantity": 2,
+        "price": 25000
     }
 ]
 
@@ -20,70 +24,75 @@ users = [
 @app.route("/")
 def home():
     return jsonify({
-        "service": "User Service",
+        "service": "Order Service",
         "status": "Running"
     })
 
-# Get all users
-@app.route("/users", methods=["GET"])
-def get_users():
-    return jsonify(users)
+# Get all orders
+@app.route("/orders", methods=["GET"])
+def get_orders():
+    return jsonify(orders)
 
-# Get user by ID
-@app.route("/users/<int:id>", methods=["GET"])
-def get_user(id):
-    for user in users:
-        if user["id"] == id:
-            return jsonify(user)
-    return jsonify({"message": "User not found"}), 404
+# Get order by ID
+@app.route("/orders/<int:id>", methods=["GET"])
+def get_order(id):
+    for order in orders:
+        if order["id"] == id:
+            return jsonify(order)
+    return jsonify({"message": "Order not found"}), 404
 
-# Add new user
-@app.route("/users", methods=["POST"])
-def create_user():
+# Create Order
+@app.route("/orders", methods=["POST"])
+def create_order():
     data = request.get_json()
 
-    user = {
-        "id": len(users) + 1,
-        "name": data["name"],
-        "email": data["email"]
+    order = {
+        "id": len(orders) + 1,
+        "user_id": data["user_id"],
+        "product": data["product"],
+        "quantity": data["quantity"],
+        "price": data["price"]
     }
 
-    users.append(user)
+    orders.append(order)
 
-    return jsonify(user), 201
+    return jsonify(order), 201
 
-# Update user
-@app.route("/users/<int:id>", methods=["PUT"])
-def update_user(id):
+# Update Order
+@app.route("/orders/<int:id>", methods=["PUT"])
+def update_order(id):
+
     data = request.get_json()
 
-    for user in users:
-        if user["id"] == id:
-            user["name"] = data["name"]
-            user["email"] = data["email"]
-            return jsonify(user)
+    for order in orders:
+        if order["id"] == id:
+            order["product"] = data["product"]
+            order["quantity"] = data["quantity"]
+            order["price"] = data["price"]
 
-    return jsonify({"message": "User not found"}), 404
+            return jsonify(order)
 
-# Delete user
-@app.route("/users/<int:id>", methods=["DELETE"])
-def delete_user(id):
-    for user in users:
-        if user["id"] == id:
-            users.remove(user)
-            return jsonify({"message": "User deleted"})
+    return jsonify({"message": "Order not found"}), 404
 
-    return jsonify({"message": "User not found"}), 404
+# Delete Order
+@app.route("/orders/<int:id>", methods=["DELETE"])
+def delete_order(id):
+
+    for order in orders:
+        if order["id"] == id:
+            orders.remove(order)
+            return jsonify({"message": "Order deleted"})
+
+    return jsonify({"message": "Order not found"}), 404
 
 if _name_ == "_main_":
-    app.run(host="0.0.0.0", port=5000)
+    app.run(host="0.0.0.0", port=5001)
 
-
-2.requirments.txt
+2.requirements.txt
 
 Flask==3.0.3
 
-3.Dockerfile
+3.Dockerfile 
 
 FROM python:3.12-slim
 
@@ -95,9 +104,10 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 COPY . .
 
-EXPOSE 5000
+EXPOSE 5001
 
 CMD ["python", "app.py"]
+
 
 4. .gitignore
 
